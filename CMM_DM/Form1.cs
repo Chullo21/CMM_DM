@@ -1,5 +1,6 @@
 using System.Reflection;
 using OfficeOpenXml;
+using OfficeOpenXml.Style;
 
 namespace CMM_DM
 {
@@ -38,29 +39,56 @@ namespace CMM_DM
             cmmDataList.Clear();
             dataDgv.Rows.Clear();
 
-            int startRow = 2;
+            int startRow = 26;
 
-            FileInfo fileInfo = new FileInfo(directoryTxt.Text);
-
-            using (ExcelPackage package = new ExcelPackage(fileInfo))
+            using (ExcelPackage package = new ExcelPackage(directoryTxt.Text))
             {
                 ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
 
                 do
                 {
                     CMMData data = new CMMData();
+                    string? primaryNum = worksheet.Cells[startRow, 2].Value?.ToString();
+
+                    if (!string.IsNullOrEmpty(primaryNum) && primaryNum.StartsWith('#'))
                     {
-                        data.ItemNo = worksheet.Cells[startRow, 1].Value?.ToString() ?? "";
-                        data.MinTol = worksheet.Cells[startRow, 2].Value?.ToString() ?? "";
-                        data.MaxTol = worksheet.Cells[startRow, 3].Value?.ToString() ?? "";
-                        data.Actual = worksheet.Cells[startRow, 4].Value?.ToString() ?? "";
+                        data.ItemNo = primaryNum;
                     }
 
-                    cmmDataList.Add(data);
-                    dataDgv.Rows.Add(data.ItemNo, data.MinTol, data.MaxTol, data.Actual);
-                    startRow++;
+                    int currentRow = startRow + 1;
 
-                } while (startRow <= 16);
+                    do
+                    {
+                        data.MinTol = worksheet.Cells[currentRow, 24].Value?.ToString() ?? "";
+                        data.MaxTol = worksheet.Cells[currentRow, 20].Value?.ToString() ?? "";
+                        data.Actual = worksheet.Cells[currentRow, 26].Value?.ToString() ?? "";
+
+                        cmmDataList.Add(data);
+                        dataDgv.Rows.Add(data.ItemNo, data.MinTol, data.MaxTol, data.Actual);
+
+                        if (worksheet.Cells[currentRow + 1, 2].Value == null && worksheet.Cells[currentRow + 1, 26].Value != null && !worksheet.Cells[currentRow + 1, 2].Merge)
+                        {
+                            currentRow++;
+                        }
+                        else
+                        {
+                            startRow = currentRow;
+                            break;
+                        }
+
+                    } while (true);
+
+                    string? endChecker = worksheet.Cells[startRow + 1, 2].Value?.ToString();
+                    if (!string.IsNullOrEmpty(endChecker))
+                    {
+                        startRow++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                } while (true);
             }
 
             if (!string.IsNullOrEmpty(iqaDir.Text) && cmmDataList.Count > 0)
@@ -103,9 +131,9 @@ namespace CMM_DM
                     excel.SaveAs(filePath);
                 }
 
-                clearBtn.PerformClick();
                 MessageBox.Show("File saved successfully!");
             }
+
         }
 
         private void SearchIQA_Click(object sender, EventArgs e)
@@ -244,11 +272,19 @@ namespace CMM_DM
 
                     if (cmmCount == 1)
                     {
-                        package.Workbook.Worksheets[thisWIndex].Cells[cRow, 1].Value = data.ItemNo;
-                        package.Workbook.Worksheets[thisWIndex].Cells[cRow, 3].Value = data.MinTol;
-                        package.Workbook.Worksheets[thisWIndex].Cells[cRow, 5].Value = data.MaxTol;
-                        package.Workbook.Worksheets[thisWIndex].Cells[cRow, 10].Value = "CMM";
-                        package.Workbook.Worksheets[thisWIndex].Cells[cRow, 11].Value = data.Actual;
+                        var ws = package.Workbook.Worksheets[thisWIndex];
+                        ws.Cells[cRow, 1].Value = data.ItemNo;
+
+                        if (ws.Cells[cRow - 1, 1].Value?.ToString() == data.ItemNo)
+                        {
+                            ws.Cells[cRow, 1].Style.Font.Color.SetColor(Color.White);
+                        }
+
+
+                        ws.Cells[cRow, 3].Value = data.MinTol;
+                        ws.Cells[cRow, 5].Value = data.MaxTol;
+                        ws.Cells[cRow, 10].Value = "CMM";
+                        ws.Cells[cRow, 11].Value = data.Actual;
 
                     }
                     else
@@ -281,5 +317,6 @@ namespace CMM_DM
         {
             MessageBox.Show("CMM DM was developed to assist in data migration from C.M.M to I.Q.A checklist. \r\n\r\nDevelopers:\r\nToledo, John Gabriel D.\r\nBolante, Kylah Mae B.", "About CMM DM");
         }
+
     }
 }
