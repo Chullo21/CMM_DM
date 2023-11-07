@@ -35,10 +35,6 @@
             automateBtn = new Button();
             clearBtn = new Button();
             dataDgv = new DataGridView();
-            number = new DataGridViewTextBoxColumn();
-            Cell2 = new DataGridViewTextBoxColumn();
-            Cell1 = new DataGridViewTextBoxColumn();
-            Cell3 = new DataGridViewTextBoxColumn();
             label2 = new Label();
             downloadbtn = new Button();
             label3 = new Label();
@@ -49,6 +45,11 @@
             tempFile = new CheckBox();
             button1 = new Button();
             pictureBox1 = new PictureBox();
+            number = new DataGridViewTextBoxColumn();
+            nominal = new DataGridViewTextBoxColumn();
+            max = new DataGridViewTextBoxColumn();
+            min = new DataGridViewTextBoxColumn();
+            actual = new DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)dataDgv).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
@@ -96,7 +97,7 @@
             // 
             // clearBtn
             // 
-            clearBtn.Location = new Point(801, 21);
+            clearBtn.Location = new Point(690, 18);
             clearBtn.Margin = new Padding(3, 4, 3, 4);
             clearBtn.Name = "clearBtn";
             clearBtn.Size = new Size(95, 31);
@@ -108,47 +109,15 @@
             // dataDgv
             // 
             dataDgv.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataDgv.Columns.AddRange(new DataGridViewColumn[] { number, Cell2, Cell1, Cell3 });
+            dataDgv.Columns.AddRange(new DataGridViewColumn[] { number, nominal, max, min, actual });
             dataDgv.ImeMode = ImeMode.NoControl;
-            dataDgv.Location = new Point(47, 228);
+            dataDgv.Location = new Point(67, 232);
             dataDgv.Margin = new Padding(3, 4, 3, 4);
             dataDgv.Name = "dataDgv";
             dataDgv.RowHeadersWidth = 51;
             dataDgv.RowTemplate.Height = 25;
-            dataDgv.Size = new Size(849, 498);
+            dataDgv.Size = new Size(677, 498);
             dataDgv.TabIndex = 10;
-            // 
-            // number
-            // 
-            number.Frozen = true;
-            number.HeaderText = "Element No.";
-            number.MinimumWidth = 6;
-            number.Name = "number";
-            number.Width = 125;
-            // 
-            // Cell2
-            // 
-            Cell2.Frozen = true;
-            Cell2.HeaderText = "Min. Tolerance";
-            Cell2.MinimumWidth = 6;
-            Cell2.Name = "Cell2";
-            Cell2.Width = 125;
-            // 
-            // Cell1
-            // 
-            Cell1.Frozen = true;
-            Cell1.HeaderText = "Max. Tolerance";
-            Cell1.MinimumWidth = 6;
-            Cell1.Name = "Cell1";
-            Cell1.Width = 125;
-            // 
-            // Cell3
-            // 
-            Cell3.Frozen = true;
-            Cell3.HeaderText = "Actual";
-            Cell3.MinimumWidth = 6;
-            Cell3.Name = "Cell3";
-            Cell3.Width = 125;
             // 
             // label2
             // 
@@ -163,7 +132,7 @@
             // downloadbtn
             // 
             downloadbtn.Enabled = false;
-            downloadbtn.Location = new Point(784, 189);
+            downloadbtn.Location = new Point(612, 190);
             downloadbtn.Name = "downloadbtn";
             downloadbtn.Size = new Size(112, 31);
             downloadbtn.TabIndex = 12;
@@ -251,12 +220,48 @@
             pictureBox1.TabIndex = 21;
             pictureBox1.TabStop = false;
             // 
+            // number
+            // 
+            number.Frozen = true;
+            number.HeaderText = "Element No.";
+            number.MinimumWidth = 6;
+            number.Name = "number";
+            number.Width = 125;
+            // 
+            // nominal
+            // 
+            nominal.HeaderText = "Nominal";
+            nominal.MinimumWidth = 6;
+            nominal.Name = "nominal";
+            nominal.Width = 125;
+            // 
+            // max
+            // 
+            max.HeaderText = "Max. Tolerance";
+            max.MinimumWidth = 6;
+            max.Name = "max";
+            max.Width = 125;
+            // 
+            // min
+            // 
+            min.HeaderText = "Min. Tolerance";
+            min.MinimumWidth = 6;
+            min.Name = "min";
+            min.Width = 125;
+            // 
+            // actual
+            // 
+            actual.HeaderText = "Actual";
+            actual.MinimumWidth = 6;
+            actual.Name = "actual";
+            actual.Width = 125;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackgroundImageLayout = ImageLayout.None;
-            ClientSize = new Size(942, 773);
+            ClientSize = new Size(797, 773);
             Controls.Add(pictureBox1);
             Controls.Add(button1);
             Controls.Add(tempFile);
@@ -299,10 +304,11 @@
         private TextBox cmmCountTxt;
         private CheckBox tempFile;
         private Button button1;
-        private DataGridViewTextBoxColumn number;
-        private DataGridViewTextBoxColumn Cell2;
-        private DataGridViewTextBoxColumn Cell1;
-        private DataGridViewTextBoxColumn Cell3;
         private PictureBox pictureBox1;
+        private DataGridViewTextBoxColumn number;
+        private DataGridViewTextBoxColumn nominal;
+        private DataGridViewTextBoxColumn max;
+        private DataGridViewTextBoxColumn min;
+        private DataGridViewTextBoxColumn actual;
     }
 }

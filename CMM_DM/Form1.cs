@@ -1,4 +1,6 @@
 using System.Reflection;
+using Microsoft.Extensions.FileSystemGlobbing.Internal;
+using System.Text.RegularExpressions;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 
@@ -15,6 +17,7 @@ namespace CMM_DM
             public string? MinTol { get; set; }
             public string? MaxTol { get; set; }
             public string? Actual { get; set; }
+            public string? Nominal { get; set; }
         }
 
         public Form1()
@@ -40,31 +43,50 @@ namespace CMM_DM
             dataDgv.Rows.Clear();
 
             int startRow = 26;
+            int lowerRow = 24;
+            int nomRow = 19;
 
-            using (ExcelPackage package = new ExcelPackage(directoryTxt.Text))
+            using (ExcelPackage package = new(directoryTxt.Text))
             {
                 ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
 
                 do
                 {
-                    CMMData data = new CMMData();
+                    //CMMData data = new();
+                    string? itemNo = "";
                     string? primaryNum = worksheet.Cells[startRow, 2].Value?.ToString();
 
                     if (!string.IsNullOrEmpty(primaryNum) && primaryNum.StartsWith('#'))
                     {
-                        data.ItemNo = primaryNum;
+                        itemNo = primaryNum;
                     }
 
                     int currentRow = startRow + 1;
 
                     do
                     {
-                        data.MinTol = worksheet.Cells[currentRow, 24].Value?.ToString() ?? "";
-                        data.MaxTol = worksheet.Cells[currentRow, 20].Value?.ToString() ?? "";
-                        data.Actual = worksheet.Cells[currentRow, 26].Value?.ToString() ?? "";
+                        string? ValChecker = worksheet.Cells[currentRow, 26].Value?.ToString();
+                        if (string.IsNullOrEmpty(ValChecker) || ValChecker == "Actual")
+                        {
+                            currentRow++;
+                            lowerRow = 25;
+                            nomRow = 18;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    } while (true);
 
-                        cmmDataList.Add(data);
-                        dataDgv.Rows.Add(data.ItemNo, data.MinTol, data.MaxTol, data.Actual);
+                    do
+                    {
+                        string? lower = worksheet.Cells[currentRow, lowerRow].Value?.ToString();
+                        string? upper = worksheet.Cells[currentRow, 20].Value.ToString();
+                        string? actual = worksheet.Cells[currentRow, 26].Value?.ToString();
+                        string? nominal = worksheet.Cells[currentRow, nomRow].Value?.ToString();
+
+                        //cmmDataList.Add(data);
+                        dataDgv.Rows.Add(itemNo, nominal, upper, lower, actual);
 
                         if (worksheet.Cells[currentRow + 1, 2].Value == null && worksheet.Cells[currentRow + 1, 26].Value != null && !worksheet.Cells[currentRow + 1, 2].Merge)
                         {
@@ -79,19 +101,19 @@ namespace CMM_DM
                     } while (true);
 
                     string? endChecker = worksheet.Cells[startRow + 1, 2].Value?.ToString();
-                    if (!string.IsNullOrEmpty(endChecker))
+                    if (string.IsNullOrEmpty(endChecker))
                     {
-                        startRow++;
+                        break;
                     }
                     else
                     {
-                        break;
+                        startRow++;
                     }
 
                 } while (true);
             }
 
-            if (!string.IsNullOrEmpty(iqaDir.Text) && cmmDataList.Count > 0)
+            if (!string.IsNullOrEmpty(iqaDir.Text))
             {
                 SaveDataBtn.Enabled = true;
             }
@@ -140,7 +162,7 @@ namespace CMM_DM
         {
             iqaDir.Text = OpenDiag();
 
-            if (!string.IsNullOrEmpty(iqaDir.Text) && cmmDataList.Count > 0)
+            if (!string.IsNullOrEmpty(iqaDir.Text))
             {
                 SaveDataBtn.Enabled = true;
             }
@@ -234,10 +256,11 @@ namespace CMM_DM
             {
                 CMMData data = new CMMData();
                 {
-                    data.ItemNo = row.Cells[0].Value?.ToString() ?? "";
-                    data.MinTol = row.Cells[1].Value?.ToString() ?? "";
-                    data.MaxTol = row.Cells[2].Value?.ToString() ?? "";
-                    data.Actual = row.Cells[3].Value?.ToString() ?? "";
+                    data.ItemNo = row.Cells[0].Value?.ToString();
+                    data.Nominal = row.Cells[1].Value?.ToString();
+                    data.MaxTol = row.Cells[2].Value?.ToString();
+                    data.MinTol = row.Cells[3].Value?.ToString();
+                    data.Actual = row.Cells[4].Value?.ToString();
                 }
 
                 if (!string.IsNullOrEmpty(data.Actual)) cmmDataList.Add(data);
@@ -273,19 +296,23 @@ namespace CMM_DM
                     if (cmmCount == 1)
                     {
                         var ws = package.Workbook.Worksheets[thisWIndex];
-                        ws.Cells[cRow, 1].Value = data.ItemNo;
+                        string itemNo = AndReplacer(data.ItemNo);
 
-                        if (ws.Cells[cRow - 1, 1].Value?.ToString() == data.ItemNo)
+                        ws.Cells[cRow, 1].Value = itemNo;
+                        ws.Cells[cRow, 1].Style.ShrinkToFit = true;
+
+                        if (ws.Cells[cRow - 1, 1].Value?.ToString() == itemNo)
                         {
                             ws.Cells[cRow, 1].Style.Font.Color.SetColor(Color.White);
                         }
 
-
-                        ws.Cells[cRow, 3].Value = data.MinTol;
+                        ws.Cells[cRow, 3].Value = data.Nominal;
                         ws.Cells[cRow, 5].Value = data.MaxTol;
+                        ws.Cells[cRow, 9].Value = OperateTols(data.Nominal, data.MinTol, '+');                     
                         ws.Cells[cRow, 10].Value = "CMM";
                         ws.Cells[cRow, 11].Value = data.Actual;
 
+                        ws.Cells[cRow, 7].Value = OperateTols(data.Nominal, data.MaxTol, '-');
                     }
                     else
                     {
@@ -311,6 +338,47 @@ namespace CMM_DM
             automateBtn.Enabled = false;
             SearchIQA.Enabled = false;
             EnableDownloadBtn(true);
+        }
+
+        private string AndReplacer(string val)
+        {
+            if (val.Contains("and")) val = Regex.Replace(val, " and ", "-");
+
+            return val;
+        }
+
+        private string OperateTols(string nom, string tol, char op)
+        {
+            string nominal = "";
+            string tolerance = "";
+            string res = "";
+
+            foreach (char n in nom)
+            {
+                if (char.IsDigit(n) || n == '.')
+                {
+                    nominal += n;
+                }
+            }
+
+            foreach (char t in tol)
+            {
+                if (char.IsDigit(t) || t == '.')
+                {
+                    tolerance += t;
+                }
+            }
+          
+            if (op == '+')
+            {
+                res = (double.Parse(nominal) + double.Parse(tolerance)).ToString();
+            }
+            else
+            {
+                res = (double.Parse(nominal) - double.Parse(tolerance)).ToString();
+            }
+
+            return res;
         }
 
         private void button1_Click(object sender, EventArgs e)
