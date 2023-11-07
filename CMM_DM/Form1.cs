@@ -39,89 +39,97 @@ namespace CMM_DM
 
         private void automateBtn_Click(object sender, EventArgs e)
         {
-            cmmDataList.Clear();
-            dataDgv.Rows.Clear();
-
-            int startRow = 26;
-            int lowerRow = 24;
-            int nomRow = 19;
-
-            using (ExcelPackage package = new(directoryTxt.Text))
+            try
             {
-                ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                cmmDataList.Clear();
+                dataDgv.Rows.Clear();
 
-                do
+                int startRow = 26;
+                int lowerRow = 24;
+                int nomRow = 19;
+
+                using (ExcelPackage package = new(directoryTxt.Text))
                 {
-                    //CMMData data = new();
-                    string? itemNo = "";
-                    string? primaryNum = worksheet.Cells[startRow, 2].Value?.ToString();
-
-                    if (!string.IsNullOrEmpty(primaryNum) && primaryNum.StartsWith('#'))
-                    {
-                        itemNo = primaryNum;
-                    }
-
-                    int currentRow = startRow + 1;
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
 
                     do
                     {
-                        string? ValChecker = worksheet.Cells[currentRow, 26].Value?.ToString();
-                        if (string.IsNullOrEmpty(ValChecker) || ValChecker == "Actual")
+                        //CMMData data = new();
+                        string? itemNo = "";
+                        string? primaryNum = worksheet.Cells[startRow, 2].Value?.ToString();
+
+                        if (!string.IsNullOrEmpty(primaryNum) && primaryNum.StartsWith('#'))
                         {
-                            currentRow++;
-                            lowerRow = 25;
-                            nomRow = 18;
+                            itemNo = primaryNum;
                         }
-                        else
+
+                        int currentRow = startRow + 1;
+
+                        do
+                        {
+                            string? ValChecker = worksheet.Cells[currentRow, 26].Value?.ToString();
+                            if (string.IsNullOrEmpty(ValChecker) || ValChecker == "Actual")
+                            {
+                                currentRow++;
+                                lowerRow = 25;
+                                nomRow = 18;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        } while (true);
+
+                        do
+                        {
+                            string? lower = worksheet.Cells[currentRow, lowerRow].Value?.ToString();
+                            string? upper = worksheet.Cells[currentRow, 20].Value.ToString();
+                            string? actual = worksheet.Cells[currentRow, 26].Value?.ToString();
+                            string? nominal = worksheet.Cells[currentRow, nomRow].Value?.ToString();
+
+                            //cmmDataList.Add(data);
+                            dataDgv.Rows.Add(itemNo, nominal, upper, lower, actual);
+
+                            if (worksheet.Cells[currentRow + 1, 2].Value == null && worksheet.Cells[currentRow + 1, 26].Value != null && !worksheet.Cells[currentRow + 1, 2].Merge)
+                            {
+                                currentRow++;
+                            }
+                            else
+                            {
+                                startRow = currentRow;
+                                break;
+                            }
+
+                        } while (true);
+
+                        string? endChecker = worksheet.Cells[startRow + 1, 2].Value?.ToString();
+                        if (string.IsNullOrEmpty(endChecker))
                         {
                             break;
                         }
-                    } while (true);
-
-                    do
-                    {
-                        string? lower = worksheet.Cells[currentRow, lowerRow].Value?.ToString();
-                        string? upper = worksheet.Cells[currentRow, 20].Value.ToString();
-                        string? actual = worksheet.Cells[currentRow, 26].Value?.ToString();
-                        string? nominal = worksheet.Cells[currentRow, nomRow].Value?.ToString();
-
-                        //cmmDataList.Add(data);
-                        dataDgv.Rows.Add(itemNo, nominal, upper, lower, actual);
-
-                        if (worksheet.Cells[currentRow + 1, 2].Value == null && worksheet.Cells[currentRow + 1, 26].Value != null && !worksheet.Cells[currentRow + 1, 2].Merge)
-                        {
-                            currentRow++;
-                        }
                         else
                         {
-                            startRow = currentRow;
-                            break;
+                            startRow++;
                         }
 
                     } while (true);
+                }
 
-                    string? endChecker = worksheet.Cells[startRow + 1, 2].Value?.ToString();
-                    if (string.IsNullOrEmpty(endChecker))
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        startRow++;
-                    }
+                if (!string.IsNullOrEmpty(iqaDir.Text))
+                {
+                    SaveDataBtn.Enabled = true;
+                }
 
-                } while (true);
+                cmmCountTxt.Text = (CmmCountFunct() + 1).ToString();
+                getDirBtn.Enabled = false;
+                directoryTxt.Clear();
+                automateBtn.Enabled = false;
             }
-
-            if (!string.IsNullOrEmpty(iqaDir.Text))
+            catch (Exception ex)
             {
-                SaveDataBtn.Enabled = true;
+                MessageBox.Show($"Something went wrong.\r\n{ex}", "Error");
+                clearBtn.PerformClick();
             }
-
-            cmmCountTxt.Text = (CmmCountFunct() + 1).ToString();
-            getDirBtn.Enabled = false;
-            directoryTxt.Clear();
-            automateBtn.Enabled = false;
         }
 
         private void clearBtn_Click(object sender, EventArgs e)
@@ -249,7 +257,6 @@ namespace CMM_DM
             int nextCol = 10 + cmmCount;
 
             int thisWIndex = 0;
-            int wIndex = startRow[0];
             int cRow = startRow[1];
 
             foreach (DataGridViewRow row in dataDgv.Rows)
