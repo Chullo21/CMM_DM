@@ -3,13 +3,17 @@ using Microsoft.Extensions.FileSystemGlobbing.Internal;
 using System.Text.RegularExpressions;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using System.IO.Packaging;
 
 namespace CMM_DM
 {
     public partial class Form1 : Form
     {
         static List<CMMData> cmmDataList = new List<CMMData>();
-        static string? tempFilePath;
+        //static string? tempFilePath;
+        static ExcelPackage package = new();
+
+        static bool browseIQA = false;
 
         private class CMMData
         {
@@ -144,6 +148,8 @@ namespace CMM_DM
             SearchIQA.Enabled = true;
             downloadbtn.Enabled = false;
             cmmCountTxt.Text = "0";
+            IQATemplateBtn.Enabled = true;
+            package = new();
         }
 
         private void downloadbtn_Click(object sender, EventArgs e)
@@ -153,15 +159,21 @@ namespace CMM_DM
             saveFileDialog.Filter = "Excel Files (*.xlsx)|*.xlsx";
             saveFileDialog.FileName = "CMMNAMEHERE.xlsx";
 
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            try
             {
-                string filePath = saveFileDialog.FileName;
-                using (ExcelPackage excel = new ExcelPackage(iqaDir.Text))
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    excel.SaveAs(filePath);
-                }
+                    string filePath = saveFileDialog.FileName;
+                    package.SaveAs(filePath);
 
-                MessageBox.Show("File saved successfully!");
+                    MessageBox.Show("File saved successfully!");
+
+                    clearBtn.PerformClick();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error:\r\n{ex}", "Something went wrong");
             }
 
         }
@@ -169,6 +181,7 @@ namespace CMM_DM
         private void SearchIQA_Click(object sender, EventArgs e)
         {
             iqaDir.Text = OpenDiag();
+            browseIQA = true;
 
             if (!string.IsNullOrEmpty(iqaDir.Text))
             {
@@ -184,9 +197,7 @@ namespace CMM_DM
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                string selectedFilePath = openFileDialog.FileName;
-
-                return selectedFilePath;
+                return openFileDialog.FileName;
             }
 
             return "";
@@ -197,67 +208,86 @@ namespace CMM_DM
             downloadbtn.Enabled = enable;
         }
 
-        private int[] GetStarRow()
+        private int GetStarRow()
         {
             int cmmCount = CmmCountFunct();
+            int res = 0;
+            int startRow = 38;
+            int wPlusser = cmmCount == 1 ? 11 : cmmCount + 10;
+            var pack = package.Workbook.Worksheets[0];
 
-            using (ExcelPackage excel = new ExcelPackage(new FileInfo(iqaDir.Text)))
+            do
             {
-                int[] ints = new int[2];
-
-                int wIndex = 0;
-                int startRow = wIndex > 1 ? 14 : 38;
-                int wPlusser = cmmCount == 1 ? 11 : cmmCount + 10;
-                do
+                object val = pack.Cells[startRow, wPlusser].Value;
+                if (val == null)
                 {
-                    if (excel.Workbook.Worksheets[wIndex].Cells[startRow, wPlusser].Value == null)
-                    {
-                        break;
-                    }
+                    break;
+                }
 
-                    if (startRow >= 65)
-                    {
-                        startRow = 14;
-                        wIndex++;
-                    }
+                if (startRow >= 65)
+                {
+                    startRow = 14;
+                }
 
-                    startRow++;
+                startRow++;
 
-                } while (true);
+            } while (true);
 
-                ints[0] = wIndex;
-                ints[1] = startRow >= 65 ? 65 : startRow;
+            res = startRow >= 65 ? 65 : startRow;
 
-                return ints;
-            }
+            return res;
 
         }
 
         private int CmmCountFunct()
         {
-            int cmmCount;
+            return int.Parse(cmmCountTxt.Text);
 
-            if (int.TryParse(cmmCountTxt.Text, out cmmCount))
-            {
-                return cmmCount;
-            }
-            else
-            {
-                return 0;
-            }
+        }
 
+        private bool VerifyCS()
+        {
+            using (ExcelPackage ver = new(iqaDir.Text))
+            {
+                if (ver.Workbook.Worksheets[0].Cells[1, 5].Value?.ToString() != "INSPECTION CHECKLIST")
+                {
+                    MessageBox.Show("Error IQA Checksheet, you have selected an invalid sheet.\r\nPlease select a valid sheet.", "Something went wrong");
+                    iqaDir.Clear();
+                    SaveDataBtn.Enabled = false;
+
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
         }
 
         private void SaveDataBtn_Click(object sender, EventArgs e)
         {
             cmmDataList.Clear();
 
-            int[] startRow = GetStarRow();
             int cmmCount = CmmCountFunct();
-            int nextCol = 10 + cmmCount;
+
+            if (cmmCount == 1)
+            {
+                if (browseIQA)
+                {
+                    package = new ExcelPackage(new FileInfo(iqaDir.Text));
+                    if (VerifyCS()) return;
+                }
+                else
+                {
+                    Assembly assembly = Assembly.GetExecutingAssembly();
+                    package = new ExcelPackage(assembly.GetManifestResourceStream("CMM_DM.Resources.Templates.IQA_CS.xlsx"));
+                }
+            }
+
+            int nextCol = 10 + CmmCountFunct();
 
             int thisWIndex = 0;
-            int cRow = startRow[1];
+            int cRow = GetStarRow();
 
             foreach (DataGridViewRow row in dataDgv.Rows)
             {
@@ -273,73 +303,83 @@ namespace CMM_DM
                 if (!string.IsNullOrEmpty(data.Actual)) cmmDataList.Add(data);
             }
 
-            using (ExcelPackage package = new ExcelPackage(new FileInfo(iqaDir.Text)))
+            foreach (var data in cmmDataList)
             {
-                foreach (var data in cmmDataList)
+                if (cRow >= 65)
                 {
-                    if (cRow >= 65)
-                    {
-                        thisWIndex++;
-                        cRow = 14;
-
-                        if (cmmCount == 1)
-                        {
-                            Assembly assembly = Assembly.GetExecutingAssembly();
-
-                            using (Stream? stream = assembly.GetManifestResourceStream("CMM_DM.p2.xlsx"))
-                            {
-                                if (stream != null)
-                                {
-                                    using (ExcelPackage takep2 = new ExcelPackage(stream))
-                                    {
-                                        package.Workbook.Worksheets.Add("P" + (package.Workbook.Worksheets.Count + 1).ToString(), takep2.Workbook.Worksheets[0]);
-                                    }
-                                }
-                            }
-                        }
-
-                    }
+                    thisWIndex++;
+                    cRow = 14;
 
                     if (cmmCount == 1)
                     {
-                        var ws = package.Workbook.Worksheets[thisWIndex];
-                        string itemNo = AndReplacer(data.ItemNo);
+                        Assembly assembly = Assembly.GetExecutingAssembly();
 
-                        ws.Cells[cRow, 1].Value = itemNo;
-                        ws.Cells[cRow, 1].Style.ShrinkToFit = true;
-
-                        if (ws.Cells[cRow - 1, 1].Value?.ToString() == itemNo)
+                        using (Stream? stream = assembly.GetManifestResourceStream("CMM_DM.Resources.Templates.p2.xlsx"))
                         {
-                            ws.Cells[cRow, 1].Style.Font.Color.SetColor(Color.White);
+                            if (stream != null)
+                            {
+                                using (ExcelPackage takep2 = new ExcelPackage(stream))
+                                {
+                                    package.Workbook.Worksheets.Add("P" + (package.Workbook.Worksheets.Count + 1).ToString(), takep2.Workbook.Worksheets[0]);
+                                }
+                            }
                         }
+                    }
 
-                        ws.Cells[cRow, 3].Value = data.Nominal;
-                        ws.Cells[cRow, 5].Value = data.MaxTol;
-                        ws.Cells[cRow, 9].Value = OperateTols(data.Nominal, data.MinTol, '+');                     
-                        ws.Cells[cRow, 10].Value = "CMM";
-                        ws.Cells[cRow, 11].Value = data.Actual;
+                }
 
-                        ws.Cells[cRow, 7].Value = OperateTols(data.Nominal, data.MaxTol, '-');
+                var ws = package.Workbook.Worksheets[thisWIndex];
+                int actualColorSetter = 11;
+
+                if (cmmCount == 1)
+                {
+                    string itemNo = AndReplacer(data.ItemNo);
+                    string? prevChecker = ws.Cells[cRow - 1, 1].Value?.ToString().Trim();
+                    ws.Cells[cRow, 1].Value = itemNo.Trim();
+                    ws.Cells[cRow, 1].Style.ShrinkToFit = true;
+
+                    if (!string.IsNullOrEmpty(prevChecker) && prevChecker.Trim() == itemNo.Trim())
+                    {
+                        ws.Cells[cRow, 1].Style.Font.Color.SetColor(Color.White);
+                    }
+
+                    if (data.MaxTol == "0.000")
+                    {
+                        ws.Cells[cRow, 2, cRow, 5].Merge = true;
+                        ws.Cells[cRow, 2].Value = $"{data.Nominal}/-{data.MinTol}/+{data.MaxTol}";
+                        ws.Cells[cRow, 9].Value = double.Parse(data.Nominal).ToString("0.00");
+                        ws.Cells[cRow, 7].Value = OperateTols(data.Nominal, data.MinTol, '-');
+                    }
+                    else if (data.MinTol == "0.000")
+                    {
+                        ws.Cells[cRow, 2, cRow, 5].Merge = true;
+                        ws.Cells[cRow, 2].Value = $"{data.Nominal}/-{data.MinTol}/+{data.MaxTol}";
+                        ws.Cells[cRow, 7].Value = double.Parse(data.Nominal).ToString("0.00");
+                        ws.Cells[cRow, 9].Value = OperateTols(data.Nominal, data.MaxTol, '+');
                     }
                     else
                     {
-                        package.Workbook.Worksheets[thisWIndex].Cells[cRow, nextCol].Value = data.Actual;
+                        ws.Cells[cRow, 3].Value = data.Nominal; //nominal
+                        ws.Cells[cRow, 5].Value = data.MaxTol; // tolerance
+                        ws.Cells[cRow, 9].Value = OperateTols(data.Nominal, data.MaxTol, '+'); // min tol
+                        ws.Cells[cRow, 7].Value = OperateTols(data.Nominal, data.MaxTol, '-'); // max tol
                     }
-
-                    cRow++;
+                    ws.Cells[cRow, 7, cRow, 9].Style.WrapText = false;
+                    ws.Cells[cRow, 10].Value = "CMM"; // type
+                    ws.Cells[cRow, 11].Value = double.Parse(data.Actual).ToString("0.00"); // actual
                 }
-
-                if (!tempFile.Checked)
+                else
                 {
-                    tempFilePath = Path.ChangeExtension(Path.GetTempFileName(), ".xlsx");
-                    iqaDir.Text = tempFilePath.ToString();
-                    tempFile.Checked = true;
+                    ws.Cells[cRow, nextCol].Value = double.Parse(data.Actual).ToString("0.00");
+                    actualColorSetter = nextCol;
                 }
 
-                package.SaveAs(new FileInfo(iqaDir.Text));
+                if (double.Parse(data.Actual) > double.Parse(ws.Cells[cRow, 9].Value?.ToString()) || double.Parse(data.Actual) < double.Parse(ws.Cells[cRow, 7].Value?.ToString())) ws.Cells[cRow, actualColorSetter].Style.Font.Color.SetColor(Color.Red);
+                cRow++;
             }
 
             SaveDataBtn.Enabled = false;
+            IQATemplateBtn.Enabled = false;
             getDirBtn.Enabled = true;
             dataDgv.Rows.Clear();
             automateBtn.Enabled = false;
@@ -358,11 +398,11 @@ namespace CMM_DM
         {
             string nominal = "";
             string tolerance = "";
-            string res = "";
+            double res = 0.00;
 
             foreach (char n in nom)
             {
-                if (char.IsDigit(n) || n == '.')
+                if (char.IsDigit(n) || n == '.' || n == '-')
                 {
                     nominal += n;
                 }
@@ -370,22 +410,22 @@ namespace CMM_DM
 
             foreach (char t in tol)
             {
-                if (char.IsDigit(t) || t == '.')
+                if (char.IsDigit(t) || t == '.' || t == '-')
                 {
                     tolerance += t;
                 }
             }
-          
+
             if (op == '+')
             {
-                res = (double.Parse(nominal) + double.Parse(tolerance)).ToString();
+                res = ((double.Parse(nominal)) + (double.Parse(tolerance)));
             }
             else
             {
-                res = (double.Parse(nominal) - double.Parse(tolerance)).ToString();
+                res = ((double.Parse(nominal)) - (double.Parse(tolerance)));
             }
 
-            return res;
+            return res.ToString("0.00");
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -393,5 +433,13 @@ namespace CMM_DM
             MessageBox.Show("CMM DM was developed to assist in data migration from C.M.M to I.Q.A checklist. \r\n\r\nDevelopers:\r\nToledo, John Gabriel D.\r\nBolante, Kylah Mae B.", "About CMM DM");
         }
 
+        private void IQATemplateBtn_Click(object sender, EventArgs e)
+        {
+            iqaDir.Text = "Template";
+            //SearchIQA.Enabled = false;
+            SaveDataBtn.Enabled = true;
+            //IQATemplateBtn.Enabled = false;
+            browseIQA = false;
+        }
     }
 }

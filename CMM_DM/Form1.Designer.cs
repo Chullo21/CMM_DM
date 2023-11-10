@@ -35,6 +35,11 @@
             automateBtn = new Button();
             clearBtn = new Button();
             dataDgv = new DataGridView();
+            number = new DataGridViewTextBoxColumn();
+            nominal = new DataGridViewTextBoxColumn();
+            max = new DataGridViewTextBoxColumn();
+            min = new DataGridViewTextBoxColumn();
+            actual = new DataGridViewTextBoxColumn();
             label2 = new Label();
             downloadbtn = new Button();
             label3 = new Label();
@@ -42,21 +47,16 @@
             SearchIQA = new Button();
             SaveDataBtn = new Button();
             cmmCountTxt = new TextBox();
-            tempFile = new CheckBox();
             button1 = new Button();
             pictureBox1 = new PictureBox();
-            number = new DataGridViewTextBoxColumn();
-            nominal = new DataGridViewTextBoxColumn();
-            max = new DataGridViewTextBoxColumn();
-            min = new DataGridViewTextBoxColumn();
-            actual = new DataGridViewTextBoxColumn();
+            IQATemplateBtn = new Button();
             ((System.ComponentModel.ISupportInitialize)dataDgv).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
             // getDirBtn
             // 
-            getDirBtn.Location = new Point(234, 77);
+            getDirBtn.Location = new Point(196, 82);
             getDirBtn.Name = "getDirBtn";
             getDirBtn.Size = new Size(94, 29);
             getDirBtn.TabIndex = 0;
@@ -66,17 +66,17 @@
             // 
             // directoryTxt
             // 
-            directoryTxt.Location = new Point(461, 78);
+            directoryTxt.Location = new Point(385, 85);
             directoryTxt.Margin = new Padding(3, 4, 3, 4);
             directoryTxt.Name = "directoryTxt";
             directoryTxt.ReadOnly = true;
-            directoryTxt.Size = new Size(155, 27);
+            directoryTxt.Size = new Size(174, 27);
             directoryTxt.TabIndex = 1;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(350, 81);
+            label1.Location = new Point(296, 86);
             label1.Name = "label1";
             label1.Size = new Size(83, 20);
             label1.TabIndex = 2;
@@ -86,10 +86,10 @@
             // 
             automateBtn.BackColor = SystemColors.ButtonHighlight;
             automateBtn.Enabled = false;
-            automateBtn.Location = new Point(690, 76);
+            automateBtn.Location = new Point(624, 81);
             automateBtn.Margin = new Padding(3, 4, 3, 4);
             automateBtn.Name = "automateBtn";
-            automateBtn.Size = new Size(92, 31);
+            automateBtn.Size = new Size(82, 31);
             automateBtn.TabIndex = 3;
             automateBtn.Text = "Collect";
             automateBtn.UseVisualStyleBackColor = false;
@@ -97,10 +97,10 @@
             // 
             // clearBtn
             // 
-            clearBtn.Location = new Point(690, 18);
+            clearBtn.Location = new Point(624, 23);
             clearBtn.Margin = new Padding(3, 4, 3, 4);
             clearBtn.Name = "clearBtn";
-            clearBtn.Size = new Size(95, 31);
+            clearBtn.Size = new Size(82, 31);
             clearBtn.TabIndex = 7;
             clearBtn.Text = "Clear all";
             clearBtn.UseVisualStyleBackColor = true;
@@ -111,114 +111,13 @@
             dataDgv.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataDgv.Columns.AddRange(new DataGridViewColumn[] { number, nominal, max, min, actual });
             dataDgv.ImeMode = ImeMode.NoControl;
-            dataDgv.Location = new Point(67, 232);
+            dataDgv.Location = new Point(29, 213);
             dataDgv.Margin = new Padding(3, 4, 3, 4);
             dataDgv.Name = "dataDgv";
             dataDgv.RowHeadersWidth = 51;
             dataDgv.RowTemplate.Height = 25;
-            dataDgv.Size = new Size(677, 498);
+            dataDgv.Size = new Size(677, 364);
             dataDgv.TabIndex = 10;
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Font = new Font("Century Gothic", 19.8000011F, FontStyle.Bold, GraphicsUnit.Point);
-            label2.Location = new Point(234, 18);
-            label2.Name = "label2";
-            label2.Size = new Size(341, 40);
-            label2.TabIndex = 11;
-            label2.Text = "CMM Data Migrator";
-            // 
-            // downloadbtn
-            // 
-            downloadbtn.Enabled = false;
-            downloadbtn.Location = new Point(612, 190);
-            downloadbtn.Name = "downloadbtn";
-            downloadbtn.Size = new Size(112, 31);
-            downloadbtn.TabIndex = 12;
-            downloadbtn.Text = "Download";
-            downloadbtn.UseVisualStyleBackColor = true;
-            downloadbtn.Click += downloadbtn_Click;
-            // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Location = new Point(334, 129);
-            label3.Name = "label3";
-            label3.Size = new Size(121, 20);
-            label3.TabIndex = 15;
-            label3.Text = "I.Q.A Checksheet:";
-            // 
-            // iqaDir
-            // 
-            iqaDir.Location = new Point(461, 126);
-            iqaDir.Margin = new Padding(3, 4, 3, 4);
-            iqaDir.Name = "iqaDir";
-            iqaDir.ReadOnly = true;
-            iqaDir.Size = new Size(321, 27);
-            iqaDir.TabIndex = 14;
-            // 
-            // SearchIQA
-            // 
-            SearchIQA.Location = new Point(234, 125);
-            SearchIQA.Name = "SearchIQA";
-            SearchIQA.Size = new Size(94, 29);
-            SearchIQA.TabIndex = 16;
-            SearchIQA.Text = "Browse";
-            SearchIQA.UseVisualStyleBackColor = true;
-            SearchIQA.Click += SearchIQA_Click;
-            // 
-            // SaveDataBtn
-            // 
-            SaveDataBtn.Enabled = false;
-            SaveDataBtn.Location = new Point(47, 192);
-            SaveDataBtn.Name = "SaveDataBtn";
-            SaveDataBtn.Size = new Size(378, 29);
-            SaveDataBtn.TabIndex = 17;
-            SaveDataBtn.Text = "Save Data";
-            SaveDataBtn.UseVisualStyleBackColor = true;
-            SaveDataBtn.Click += SaveDataBtn_Click;
-            // 
-            // cmmCountTxt
-            // 
-            cmmCountTxt.Location = new Point(622, 78);
-            cmmCountTxt.Name = "cmmCountTxt";
-            cmmCountTxt.ReadOnly = true;
-            cmmCountTxt.Size = new Size(62, 27);
-            cmmCountTxt.TabIndex = 18;
-            cmmCountTxt.TextAlign = HorizontalAlignment.Center;
-            // 
-            // tempFile
-            // 
-            tempFile.AutoSize = true;
-            tempFile.Location = new Point(12, 737);
-            tempFile.Name = "tempFile";
-            tempFile.Size = new Size(91, 24);
-            tempFile.TabIndex = 19;
-            tempFile.Text = "TempFile";
-            tempFile.UseVisualStyleBackColor = true;
-            tempFile.Visible = false;
-            // 
-            // button1
-            // 
-            button1.Location = new Point(788, 733);
-            button1.Name = "button1";
-            button1.Size = new Size(108, 31);
-            button1.TabIndex = 20;
-            button1.Text = "Developers";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
-            // 
-            // pictureBox1
-            // 
-            pictureBox1.BackgroundImageLayout = ImageLayout.None;
-            pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(47, 18);
-            pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(163, 146);
-            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
-            pictureBox1.TabIndex = 21;
-            pictureBox1.TabStop = false;
             // 
             // number
             // 
@@ -256,15 +155,115 @@
             actual.Name = "actual";
             actual.Width = 125;
             // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Font = new Font("Century Gothic", 19.8000011F, FontStyle.Bold, GraphicsUnit.Point);
+            label2.Location = new Point(196, 23);
+            label2.Name = "label2";
+            label2.Size = new Size(341, 40);
+            label2.TabIndex = 11;
+            label2.Text = "CMM Data Migrator";
+            // 
+            // downloadbtn
+            // 
+            downloadbtn.Enabled = false;
+            downloadbtn.Location = new Point(29, 175);
+            downloadbtn.Name = "downloadbtn";
+            downloadbtn.Size = new Size(163, 31);
+            downloadbtn.TabIndex = 12;
+            downloadbtn.Text = "Download";
+            downloadbtn.UseVisualStyleBackColor = true;
+            downloadbtn.Click += downloadbtn_Click;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(363, 135);
+            label3.Name = "label3";
+            label3.Size = new Size(86, 20);
+            label3.TabIndex = 15;
+            label3.Text = "Checksheet:";
+            // 
+            // iqaDir
+            // 
+            iqaDir.Location = new Point(455, 131);
+            iqaDir.Margin = new Padding(3, 4, 3, 4);
+            iqaDir.Name = "iqaDir";
+            iqaDir.ReadOnly = true;
+            iqaDir.Size = new Size(163, 27);
+            iqaDir.TabIndex = 14;
+            // 
+            // SearchIQA
+            // 
+            SearchIQA.Location = new Point(196, 130);
+            SearchIQA.Name = "SearchIQA";
+            SearchIQA.Size = new Size(70, 29);
+            SearchIQA.TabIndex = 16;
+            SearchIQA.Text = "Browse";
+            SearchIQA.UseVisualStyleBackColor = true;
+            SearchIQA.Click += SearchIQA_Click;
+            // 
+            // SaveDataBtn
+            // 
+            SaveDataBtn.Enabled = false;
+            SaveDataBtn.Location = new Point(624, 131);
+            SaveDataBtn.Name = "SaveDataBtn";
+            SaveDataBtn.Size = new Size(82, 29);
+            SaveDataBtn.TabIndex = 17;
+            SaveDataBtn.Text = "Transfer Data";
+            SaveDataBtn.UseVisualStyleBackColor = true;
+            SaveDataBtn.Click += SaveDataBtn_Click;
+            // 
+            // cmmCountTxt
+            // 
+            cmmCountTxt.Location = new Point(565, 83);
+            cmmCountTxt.Name = "cmmCountTxt";
+            cmmCountTxt.ReadOnly = true;
+            cmmCountTxt.Size = new Size(53, 27);
+            cmmCountTxt.TabIndex = 18;
+            cmmCountTxt.TextAlign = HorizontalAlignment.Center;
+            // 
+            // button1
+            // 
+            button1.Location = new Point(598, 584);
+            button1.Name = "button1";
+            button1.Size = new Size(108, 31);
+            button1.TabIndex = 20;
+            button1.Text = "Developers";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
+            // 
+            // pictureBox1
+            // 
+            pictureBox1.BackgroundImageLayout = ImageLayout.None;
+            pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
+            pictureBox1.Location = new Point(29, 23);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(163, 146);
+            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox1.TabIndex = 21;
+            pictureBox1.TabStop = false;
+            // 
+            // IQATemplateBtn
+            // 
+            IQATemplateBtn.Location = new Point(272, 129);
+            IQATemplateBtn.Name = "IQATemplateBtn";
+            IQATemplateBtn.Size = new Size(85, 29);
+            IQATemplateBtn.TabIndex = 22;
+            IQATemplateBtn.Text = "Template";
+            IQATemplateBtn.UseVisualStyleBackColor = true;
+            IQATemplateBtn.Click += IQATemplateBtn_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackgroundImageLayout = ImageLayout.None;
-            ClientSize = new Size(797, 773);
+            ClientSize = new Size(735, 627);
+            Controls.Add(IQATemplateBtn);
             Controls.Add(pictureBox1);
             Controls.Add(button1);
-            Controls.Add(tempFile);
             Controls.Add(cmmCountTxt);
             Controls.Add(SaveDataBtn);
             Controls.Add(SearchIQA);
@@ -302,7 +301,6 @@
         private Button SearchIQA;
         private Button SaveDataBtn;
         private TextBox cmmCountTxt;
-        private CheckBox tempFile;
         private Button button1;
         private PictureBox pictureBox1;
         private DataGridViewTextBoxColumn number;
@@ -310,5 +308,6 @@
         private DataGridViewTextBoxColumn max;
         private DataGridViewTextBoxColumn min;
         private DataGridViewTextBoxColumn actual;
+        private Button IQATemplateBtn;
     }
 }
