@@ -2,11 +2,12 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows7.0</TargetFramework>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>Black and White Minimalist Initial Letter Business Name Logo .ico</ApplicationIcon>
+    <StartupObject>CMM_DM.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,6 +34,7 @@
 
   <ItemGroup>
     <PackageReference Include="EPPlus" Version="6.2.8" />
+    <PackageReference Include="Microsoft.VisualStudio.OLE.Interop" Version="17.8.37221" />
   </ItemGroup>
 
   <ItemGroup>

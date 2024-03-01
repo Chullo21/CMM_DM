@@ -70,7 +70,7 @@
             // 
             // directoryTxt
             // 
-            directoryTxt.Location = new Point(194, 27);
+            directoryTxt.Location = new Point(194, 25);
             directoryTxt.Margin = new Padding(3, 4, 3, 4);
             directoryTxt.Name = "directoryTxt";
             directoryTxt.ReadOnly = true;
@@ -162,7 +162,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Font = new Font("Century Gothic", 19.8000011F, FontStyle.Bold, GraphicsUnit.Point);
+            label2.Font = new Font("Century Gothic", 19.8000011F, FontStyle.Bold);
             label2.Location = new Point(195, 23);
             label2.Name = "label2";
             label2.Size = new Size(341, 40);

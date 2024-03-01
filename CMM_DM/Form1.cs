@@ -154,6 +154,9 @@ namespace CMM_DM
 
         private void downloadbtn_Click(object sender, EventArgs e)
         {
+            JudgementDimensionAnalyser();
+            JudgementAppearanceAnalyser();
+
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Title = "Save File";
             saveFileDialog.Filter = "Excel Files (*.xlsx)|*.xlsx";
@@ -385,6 +388,97 @@ namespace CMM_DM
             automateBtn.Enabled = false;
             SearchIQA.Enabled = false;
             EnableDownloadBtn(true);
+        }
+
+        private void JudgementAppearanceAnalyser()
+        {
+            int columnIdentifier = 11;
+
+            int totalNumberOfCols = 10 + int.Parse(cmmCountTxt.Text);
+
+            do
+            {
+                int rowIdentifier = 21;
+                bool judgement = false;
+
+                do
+                {
+
+                    if (CellValueGetter(rowIdentifier, columnIdentifier, 0).ToLower() == "x")
+                    {
+                        judgement = true;
+                        break;
+                    }
+
+                    rowIdentifier++;
+                } while (rowIdentifier <= 36);
+
+                for (int i = 0; i < package.Workbook.Worksheets.Count; i++)
+                {
+                    if (judgement) package.Workbook.Worksheets[i].Cells[66, columnIdentifier].Value = "FAIL"; else package.Workbook.Worksheets[i].Cells[66, columnIdentifier].Value = "PASS";
+                }
+
+                columnIdentifier++;
+            }while(columnIdentifier <= totalNumberOfCols);
+        }
+
+        private void JudgementDimensionAnalyser()
+        {
+            int columnIdentifier = 11;
+            int numberOfColumns = 10 + int.Parse(cmmCountTxt.Text);
+
+            do
+            {               
+                bool judgement = false;
+
+                for (int i = 0; i < package.Workbook.Worksheets.Count; i++)
+                {
+                    int rowIdentifier = 38;
+
+                    do
+                    {
+                        var actual = double.Parse(CellValueGetter(rowIdentifier, columnIdentifier, i));
+                        var min = double.Parse(CellValueGetter(rowIdentifier, 7, i));
+                        var max = double.Parse(CellValueGetter(rowIdentifier, 9, i));
+
+                        if (actual == 0.00 && min == 0.00 && max == 0.00) break;
+
+                        if (actual > max || actual < min)
+                        {
+                            judgement = true;
+                            break;
+                        }
+
+                        rowIdentifier++;
+
+                    } while (rowIdentifier < 65);
+
+                    if (judgement)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        rowIdentifier = 14;
+                    }
+                }
+
+                for(int i = 0; i < package.Workbook.Worksheets.Count; i++)
+                {
+                    if (judgement) package.Workbook.Worksheets[i].Cells[65, columnIdentifier].Value = "FAIL"; else package.Workbook.Worksheets[i].Cells[65, columnIdentifier].Value = "PASS";
+                }
+
+                columnIdentifier++;
+            } while (columnIdentifier <= numberOfColumns);
+        }
+
+        private string CellValueGetter(int row, int col, int worksheet)
+        {
+            var ws = package.Workbook.Worksheets[worksheet];
+
+            string res = ws.Cells[row, col].Value == null ? "" : ws.Cells[row, col].Value.ToString();
+
+            return res;
         }
 
         private string AndReplacer(string val)
