@@ -1,4 +1,5 @@
-﻿namespace CMM_DM
+﻿
+namespace CMM_DM
 {
     partial class Form1
     {
@@ -26,7 +27,7 @@
         ///  Required method for Designer support - do not modify
         ///  the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
+        private async Task InitializeComponentAsync()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             getDirBtn = new Button();
@@ -60,9 +61,10 @@
             // 
             // getDirBtn
             // 
-            getDirBtn.Location = new Point(5, 24);
+            getDirBtn.Location = new Point(4, 18);
+            getDirBtn.Margin = new Padding(3, 2, 3, 2);
             getDirBtn.Name = "getDirBtn";
-            getDirBtn.Size = new Size(94, 29);
+            getDirBtn.Size = new Size(82, 22);
             getDirBtn.TabIndex = 0;
             getDirBtn.Text = "Browse";
             getDirBtn.UseVisualStyleBackColor = true;
@@ -70,19 +72,18 @@
             // 
             // directoryTxt
             // 
-            directoryTxt.Location = new Point(194, 25);
-            directoryTxt.Margin = new Padding(3, 4, 3, 4);
+            directoryTxt.Location = new Point(170, 19);
             directoryTxt.Name = "directoryTxt";
             directoryTxt.ReadOnly = true;
-            directoryTxt.Size = new Size(174, 27);
+            directoryTxt.Size = new Size(231, 23);
             directoryTxt.TabIndex = 1;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(105, 28);
+            label1.Location = new Point(92, 21);
             label1.Name = "label1";
-            label1.Size = new Size(83, 20);
+            label1.Size = new Size(67, 15);
             label1.TabIndex = 2;
             label1.Text = "CMM Data:";
             // 
@@ -90,10 +91,9 @@
             // 
             automateBtn.BackColor = SystemColors.ButtonHighlight;
             automateBtn.Enabled = false;
-            automateBtn.Location = new Point(433, 23);
-            automateBtn.Margin = new Padding(3, 4, 3, 4);
+            automateBtn.Location = new Point(460, 19);
             automateBtn.Name = "automateBtn";
-            automateBtn.Size = new Size(82, 31);
+            automateBtn.Size = new Size(72, 23);
             automateBtn.TabIndex = 3;
             automateBtn.Text = "Collect";
             automateBtn.UseVisualStyleBackColor = false;
@@ -101,10 +101,9 @@
             // 
             // clearBtn
             // 
-            clearBtn.Location = new Point(624, 23);
-            clearBtn.Margin = new Padding(3, 4, 3, 4);
+            clearBtn.Location = new Point(624, 17);
             clearBtn.Name = "clearBtn";
-            clearBtn.Size = new Size(82, 31);
+            clearBtn.Size = new Size(72, 23);
             clearBtn.TabIndex = 7;
             clearBtn.Text = "Clear all";
             clearBtn.UseVisualStyleBackColor = true;
@@ -115,12 +114,10 @@
             dataDgv.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataDgv.Columns.AddRange(new DataGridViewColumn[] { number, nominal, max, min, actual });
             dataDgv.ImeMode = ImeMode.NoControl;
-            dataDgv.Location = new Point(29, 223);
-            dataDgv.Margin = new Padding(3, 4, 3, 4);
+            dataDgv.Location = new Point(25, 167);
             dataDgv.Name = "dataDgv";
             dataDgv.RowHeadersWidth = 51;
-            dataDgv.RowTemplate.Height = 25;
-            dataDgv.Size = new Size(677, 364);
+            dataDgv.Size = new Size(680, 384);
             dataDgv.TabIndex = 10;
             // 
             // number
@@ -163,18 +160,19 @@
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Century Gothic", 19.8000011F, FontStyle.Bold);
-            label2.Location = new Point(195, 23);
+            label2.Location = new Point(171, 17);
             label2.Name = "label2";
-            label2.Size = new Size(341, 40);
+            label2.Size = new Size(271, 32);
             label2.TabIndex = 11;
             label2.Text = "CMM Data Migrator";
             // 
             // downloadbtn
             // 
             downloadbtn.Enabled = false;
-            downloadbtn.Location = new Point(29, 185);
+            downloadbtn.Location = new Point(25, 139);
+            downloadbtn.Margin = new Padding(3, 2, 3, 2);
             downloadbtn.Name = "downloadbtn";
-            downloadbtn.Size = new Size(153, 31);
+            downloadbtn.Size = new Size(134, 23);
             downloadbtn.TabIndex = 12;
             downloadbtn.Text = "Download";
             downloadbtn.UseVisualStyleBackColor = true;
@@ -183,26 +181,26 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(174, 36);
+            label3.Location = new Point(152, 27);
             label3.Name = "label3";
-            label3.Size = new Size(86, 20);
+            label3.Size = new Size(71, 15);
             label3.TabIndex = 15;
             label3.Text = "Checksheet:";
             // 
             // iqaDir
             // 
-            iqaDir.Location = new Point(266, 32);
-            iqaDir.Margin = new Padding(3, 4, 3, 4);
+            iqaDir.Location = new Point(233, 21);
             iqaDir.Name = "iqaDir";
             iqaDir.ReadOnly = true;
-            iqaDir.Size = new Size(163, 27);
+            iqaDir.Size = new Size(221, 23);
             iqaDir.TabIndex = 14;
             // 
             // SearchIQA
             // 
-            SearchIQA.Location = new Point(7, 31);
+            SearchIQA.Location = new Point(6, 23);
+            SearchIQA.Margin = new Padding(3, 2, 3, 2);
             SearchIQA.Name = "SearchIQA";
-            SearchIQA.Size = new Size(70, 29);
+            SearchIQA.Size = new Size(61, 22);
             SearchIQA.TabIndex = 16;
             SearchIQA.Text = "Browse";
             SearchIQA.UseVisualStyleBackColor = true;
@@ -211,9 +209,10 @@
             // SaveDataBtn
             // 
             SaveDataBtn.Enabled = false;
-            SaveDataBtn.Location = new Point(433, 32);
+            SaveDataBtn.Location = new Point(460, 22);
+            SaveDataBtn.Margin = new Padding(3, 2, 3, 2);
             SaveDataBtn.Name = "SaveDataBtn";
-            SaveDataBtn.Size = new Size(82, 29);
+            SaveDataBtn.Size = new Size(72, 22);
             SaveDataBtn.TabIndex = 17;
             SaveDataBtn.Text = "Transfer Data";
             SaveDataBtn.UseVisualStyleBackColor = true;
@@ -221,18 +220,20 @@
             // 
             // cmmCountTxt
             // 
-            cmmCountTxt.Location = new Point(374, 25);
+            cmmCountTxt.Location = new Point(407, 18);
+            cmmCountTxt.Margin = new Padding(3, 2, 3, 2);
             cmmCountTxt.Name = "cmmCountTxt";
             cmmCountTxt.ReadOnly = true;
-            cmmCountTxt.Size = new Size(53, 27);
+            cmmCountTxt.Size = new Size(47, 23);
             cmmCountTxt.TabIndex = 18;
             cmmCountTxt.TextAlign = HorizontalAlignment.Center;
             // 
             // button1
             // 
-            button1.Location = new Point(598, 594);
+            button1.Location = new Point(608, 556);
+            button1.Margin = new Padding(3, 2, 3, 2);
             button1.Name = "button1";
-            button1.Size = new Size(108, 31);
+            button1.Size = new Size(94, 23);
             button1.TabIndex = 20;
             button1.Text = "Developers";
             button1.UseVisualStyleBackColor = true;
@@ -242,18 +243,20 @@
             // 
             pictureBox1.BackgroundImageLayout = ImageLayout.None;
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(29, 38);
+            pictureBox1.Location = new Point(25, 28);
+            pictureBox1.Margin = new Padding(3, 2, 3, 2);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(153, 141);
+            pictureBox1.Size = new Size(134, 106);
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox1.TabIndex = 21;
             pictureBox1.TabStop = false;
             // 
             // IQATemplateBtn
             // 
-            IQATemplateBtn.Location = new Point(83, 30);
+            IQATemplateBtn.Location = new Point(73, 22);
+            IQATemplateBtn.Margin = new Padding(3, 2, 3, 2);
             IQATemplateBtn.Name = "IQATemplateBtn";
-            IQATemplateBtn.Size = new Size(85, 29);
+            IQATemplateBtn.Size = new Size(74, 22);
             IQATemplateBtn.TabIndex = 22;
             IQATemplateBtn.Text = "Template";
             IQATemplateBtn.UseVisualStyleBackColor = true;
@@ -266,9 +269,11 @@
             groupBox1.Controls.Add(label1);
             groupBox1.Controls.Add(automateBtn);
             groupBox1.Controls.Add(cmmCountTxt);
-            groupBox1.Location = new Point(188, 66);
+            groupBox1.Location = new Point(164, 50);
+            groupBox1.Margin = new Padding(3, 2, 3, 2);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(518, 71);
+            groupBox1.Padding = new Padding(3, 2, 3, 2);
+            groupBox1.Size = new Size(538, 53);
             groupBox1.TabIndex = 23;
             groupBox1.TabStop = false;
             groupBox1.Text = "CMM FILES";
@@ -280,19 +285,21 @@
             groupBox2.Controls.Add(IQATemplateBtn);
             groupBox2.Controls.Add(SearchIQA);
             groupBox2.Controls.Add(SaveDataBtn);
-            groupBox2.Location = new Point(188, 143);
+            groupBox2.Location = new Point(164, 107);
+            groupBox2.Margin = new Padding(3, 2, 3, 2);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(518, 73);
+            groupBox2.Padding = new Padding(3, 2, 3, 2);
+            groupBox2.Size = new Size(538, 55);
             groupBox2.TabIndex = 24;
             groupBox2.TabStop = false;
             groupBox2.Text = "IQA CHECKSHEET";
             // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackgroundImageLayout = ImageLayout.None;
-            ClientSize = new Size(735, 634);
+            ClientSize = new Size(714, 590);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
             Controls.Add(pictureBox1);
@@ -302,6 +309,7 @@
             Controls.Add(dataDgv);
             Controls.Add(clearBtn);
             Icon = (Icon)resources.GetObject("$this.Icon");
+            Margin = new Padding(3, 2, 3, 2);
             Name = "Form1";
             Text = "CMM Data Migrator";
             ((System.ComponentModel.ISupportInitialize)dataDgv).EndInit();

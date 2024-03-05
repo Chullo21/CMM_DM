@@ -7,11 +7,10 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>Black and White Minimalist Initial Letter Business Name Logo .ico</ApplicationIcon>
-    <StartupObject>CMM_DM.Program</StartupObject>
+    <StartupObject></StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="loading.gif" />
     <None Remove="p2.xlsx" />
     <None Remove="Resources\Templates\IQA_CS.xlsx" />
   </ItemGroup>
@@ -21,9 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="loading.gif">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Templates\IQA_CS.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
