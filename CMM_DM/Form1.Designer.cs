@@ -27,9 +27,8 @@ namespace CMM_DM
         ///  Required method for Designer support - do not modify
         ///  the contents of this method with the code editor.
         /// </summary>
-        private async Task InitializeComponentAsync()
+        private async Task InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             getDirBtn = new Button();
             directoryTxt = new TextBox();
             label1 = new Label();
@@ -241,8 +240,8 @@ namespace CMM_DM
             // 
             // pictureBox1
             // 
-            pictureBox1.BackgroundImageLayout = ImageLayout.None;
-            pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
+            pictureBox1.BackgroundImage = Properties.Resources.Black_and_White_Minimalist_Initial_Letter_Business_Name_Logo_;
+            pictureBox1.BackgroundImageLayout = ImageLayout.Stretch;
             pictureBox1.Location = new Point(25, 28);
             pictureBox1.Margin = new Padding(3, 2, 3, 2);
             pictureBox1.Name = "pictureBox1";
@@ -308,7 +307,6 @@ namespace CMM_DM
             Controls.Add(label2);
             Controls.Add(dataDgv);
             Controls.Add(clearBtn);
-            Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(3, 2, 3, 2);
             Name = "Form1";
             Text = "CMM Data Migrator";
