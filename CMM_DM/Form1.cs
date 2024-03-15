@@ -62,10 +62,9 @@ namespace CMM_DM
             }
         }
 
-        private void ColumnSetter(ExcelWorksheet ws, int row)
+        private int ColumnSetter(ExcelWorksheet ws, int row)
         {
             int counter = 1;
-            bool stop = false;
 
             do
             {
@@ -96,20 +95,20 @@ namespace CMM_DM
                     else if (columnName.ToLower() == "deviation")
                     {
                         positions.Deviation = counter;
-                        stop = true;
+                        break;
                     }
                 }
-                else if (counter == 100)
+                else if (counter == ws.Dimension.End.Column)
                 {
-                    ++row;
+                    row++;
                     counter = 1;
                 }
 
                 ++counter;
 
-                if (stop) break;
+            } while (true);
 
-            } while (!stop);
+            return row;
         }
 
         private int EndChecker(ExcelWorksheet ws, int row)
@@ -164,10 +163,10 @@ namespace CMM_DM
                 {
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
 
-                    ColumnSetter(worksheet, currentRow);
+                    currentRow = ColumnSetter(worksheet, currentRow);
 
                     do
-                    {
+                    {                       
                         if (worksheet.Cells[currentRow, 2].Value != null)
                         {
                             if (worksheet.Cells[currentRow, 2, currentRow, positions.Deviation].Merge)
@@ -176,11 +175,9 @@ namespace CMM_DM
                             }
                             else if (worksheet.Cells[currentRow, 2].Value.ToString() == "Item")
                             {
-                                ColumnSetter(worksheet, currentRow);
+                                currentRow = ColumnSetter(worksheet, currentRow);
                             }
-                        }
-
-                        ++currentRow;
+                        }                        
 
                         do
                         {
@@ -191,15 +188,15 @@ namespace CMM_DM
                             string deviation = string.IsNullOrWhiteSpace(worksheet.Cells[currentRow, positions.Deviation].Value?.ToString()) ? "" : worksheet.Cells[currentRow, positions.Deviation].Value.ToString();
                             string elementName = string.IsNullOrWhiteSpace(worksheet.Cells[currentRow, positions.ElementName].Value?.ToString()) ? "" : worksheet.Cells[currentRow, positions.ElementName].Value.ToString();
 
-                            string element = Regex.Replace(elementName, "\n", "").ToLower();
-                            if (itemNo != "" && (lower != "" || upper != "" || actual != "" || nominal != ""))
+                            string element = Regex.Replace(elementName, "\n", " ").ToLower();
+                            if (!string.IsNullOrEmpty(itemNo) && !string.IsNullOrEmpty(elementName))
                             {
                                 string[] nominalSplit = nominal.Split('\n');
                                 string[] actualSplit = actual.Split('\n');
 
                                 int splitCounter = IndexValueChecker(nominalSplit);
 
-                                if (splitCounter > 1 && element == "circleposition")
+                                if (splitCounter > 1)
                                 {
                                     for (int i = 0; i < IndexValueChecker(nominalSplit); i++)
                                     {
@@ -224,19 +221,23 @@ namespace CMM_DM
 
                                         if (!string.IsNullOrEmpty(nominalSplit[i]))
                                         {
-                                            dataDgv.Rows.Add(itemNo, $"{characteristics[i]}{nominalSplit[i]}", upper, lower, actualSplit[i]);
+                                            //dataDgv.Rows.Add(itemNo, $"{characteristics[i]}{nominalSplit[i]}", upper, lower, actualSplit[i]);
+                                            AddDataToDgv(itemNo, $"{characteristics[i]}{nominalSplit[i]}", upper, lower, actualSplit[i]);
                                         }
                                     }
 
-                                    dataDgv.Rows.Add(itemNo, 0, upper, lower, deviation);
+                                    AddDataToDgv(itemNo, "0.0", upper, lower, deviation);
+                                    //dataDgv.Rows.Add(itemNo, 0, upper, lower, deviation);
                                 }
-                                else if (elementList.Contains(elementName))
+                                else if (elementList.Any(element.Contains))
                                 {
-                                    dataDgv.Rows.Add(itemNo, nominal, upper, lower, deviation);
+                                    AddDataToDgv(itemNo, nominal, upper, lower, deviation);
+                                    //dataDgv.Rows.Add(itemNo, nominal, upper, lower, deviation);
                                 }
                                 else
                                 {
-                                    dataDgv.Rows.Add(itemNo, nominal, upper, lower, actual);
+                                    AddDataToDgv(itemNo, nominal, upper, lower, actual);
+                                    //dataDgv.Rows.Add(itemNo, nominal, upper, lower, actual);
                                 }
                             }
 
@@ -259,6 +260,8 @@ namespace CMM_DM
                             }
 
                         } while (true);
+
+                        ++currentRow;
 
                         int endRow = EndChecker(worksheet, currentRow);
 
@@ -289,6 +292,17 @@ namespace CMM_DM
                 MessageBox.Show($"Something went wrong.\r\n{ex.Message}", "Error");
                 clearBtn.PerformClick();
             }
+        }
+
+        private void AddDataToDgv(string itemNo, string nominal, string upper, string lower, string deviation)
+        {
+            itemNo = itemNo == "" ? "0.0" : itemNo;
+            nominal = nominal == "" ? "0.0" : nominal;
+            upper = upper == "" ? "0.0" : upper;
+            lower = lower == "" ? "0.0" : lower;
+            deviation = deviation == "" ? "0.0" : deviation;
+
+            dataDgv.Rows.Add(itemNo, nominal, upper, lower, deviation);
         }
 
         private void clearBtn_Click(object sender, EventArgs e)
@@ -474,7 +488,7 @@ namespace CMM_DM
                     data.Actual = row.Cells[4].Value?.ToString();
                 }
 
-                if (!string.IsNullOrEmpty(data.Actual)) cmmDataList.Add(data);
+                if(!string.IsNullOrEmpty(data.Actual)) cmmDataList.Add(data);
             }
 
             foreach (var data in cmmDataList)
@@ -493,73 +507,69 @@ namespace CMM_DM
                 var ws = package.Workbook.Worksheets[thisWIndex];
                 int actualColorSetter = 11;
 
-                try
+                if (!string.IsNullOrEmpty(data.Nominal) && !char.IsDigit(data.Nominal[0]) && data.Nominal[0] != '-')
                 {
-                    if (!string.IsNullOrEmpty(data.Nominal) && !char.IsDigit(data.Nominal[0]) && data.Nominal[0] != '-')
+                    string dat = data.Nominal;
+                    ws.Cells[cRow, 6].Value = data.Nominal[0].ToString();
+                    data.Nominal = data.Nominal.Substring(1);
+                }
+
+                if (CmmCountFunct() == 1)
+                {                    
+                    string itemNo = AndReplacer(data.ItemNo);
+                    string? prevChecker = ws.Cells[cRow - 1, 1].Value?.ToString();
+                    ws.Cells[cRow, 1].Value = itemNo.Trim();
+                    ws.Cells[cRow, 1].Style.ShrinkToFit = true;
+
+                    if (!string.IsNullOrEmpty(prevChecker) && prevChecker == itemNo.Trim())
                     {
-                        string dat = data.Nominal;
-                        ws.Cells[cRow, 6].Value = data.Nominal[0].ToString();
-                        data.Nominal = data.Nominal.Substring(1);
-                    }
-
-                    if (CmmCountFunct() == 1)
-                    {
-                        string itemNo = AndReplacer(data.ItemNo);
-                        string? prevChecker = ws.Cells[cRow - 1, 1].Value?.ToString().Trim();
-                        ws.Cells[cRow, 1].Value = itemNo.Trim();
-                        ws.Cells[cRow, 1].Style.ShrinkToFit = true;
-
-                        if (!string.IsNullOrEmpty(prevChecker) && prevChecker.Trim() == itemNo.Trim())
-                        {
-                            ws.Cells[cRow, 1].Style.Font.Color.SetColor(Color.White);
-                        }
-
-                        if (decimal.Parse(data.MaxTol) == 0.0m)
-                        {
-                            if (!ws.Cells[cRow, 2].Merge) ws.Cells[cRow, 2, cRow, 5].Merge = true;
-                            ws.Cells[cRow, 2].Value = $"{data.Nominal}/-{data.MinTol}/+{data.MaxTol}";
-                            ws.Cells[cRow, 9].Value = decimal.Parse(data.Nominal).ToString("0.00");
-                            ws.Cells[cRow, 7].Value = OperateTols(data.Nominal, data.MinTol, '-');
-                        }
-                        else if (decimal.Parse(data.MinTol) == 0.0m)
-                        {
-                            if (!ws.Cells[cRow, 2].Merge) ws.Cells[cRow, 2, cRow, 5].Merge = true;
-                            ws.Cells[cRow, 2].Value = $"{data.Nominal}/-{data.MinTol}/+{data.MaxTol}";
-                            ws.Cells[cRow, 7].Value = data.Nominal;
-                            ws.Cells[cRow, 9].Value = OperateTols(data.Nominal, data.MaxTol, '+');
-                        }
-                        else
-                        {
-                            ws.Cells[cRow, 3].Value = data.Nominal; //nominal
-                            ws.Cells[cRow, 5].Value = data.MaxTol; // tolerance
-                            ws.Cells[cRow, 9].Value = OperateTols(data.Nominal, data.MaxTol, '+'); // min tol
-                            ws.Cells[cRow, 7].Value = OperateTols(data.Nominal, data.MaxTol, '-'); // max tol
-                        }
-
-                        ws.Cells[cRow, 7, cRow, 9].Style.WrapText = false;
-                        ws.Cells[cRow, 10].Value = "CMM"; // type
-                        ws.Cells[cRow, 11].Value = decimal.Parse(data.Actual).ToString("0.00"); // actual
-
+                        ws.Cells[cRow, 1].Style.Font.Color.SetColor(Color.White);
                     }
                     else
                     {
-                        ws.Cells[cRow, nextCol].Value = decimal.Parse(data.Actual).ToString("0.00");
-                        actualColorSetter = nextCol;
+                        ws.Cells[cRow, 1].Style.Font.Color.SetColor(Color.Black);
                     }
 
-                    string actual = data.Actual == "" ? "0.0" : data.Actual;
-                    string lower = ws.Cells[cRow, 7].Value == null ? "0.0" : ws.Cells[cRow, 7].Value.ToString();
-                    string upper = ws.Cells[cRow, 9].Value == null ? "0.0" : ws.Cells[cRow, 9].Value.ToString();
-
-                    if (decimal.Parse(actual) > decimal.Parse(upper) || decimal.Parse(actual) < decimal.Parse(lower))
+                    if (decimal.Parse(data.MaxTol) == 0.0m)
                     {
-                        ws.Cells[cRow, actualColorSetter].Style.Font.Color.SetColor(Color.Red);
+                        if (!ws.Cells[cRow, 2].Merge) ws.Cells[cRow, 2, cRow, 5].Merge = true;
+                        ws.Cells[cRow, 2].Value = $"{data.Nominal}/-{data.MinTol}/+{data.MaxTol}";
+                        ws.Cells[cRow, 9].Value = decimal.Parse(data.Nominal).ToString("0.000");
+                        ws.Cells[cRow, 7].Value = OperateTols(data.Nominal, data.MinTol, '-');
                     }
+                    else if (decimal.Parse(data.MinTol) == 0.0m)
+                    {
+                        if (!ws.Cells[cRow, 2].Merge) ws.Cells[cRow, 2, cRow, 5].Merge = true;
+                        ws.Cells[cRow, 2].Value = $"{data.Nominal}/-{data.MinTol}/+{data.MaxTol}";
+                        ws.Cells[cRow, 7].Value = data.Nominal == "" ? "0.0" : data.Nominal;
+                        ws.Cells[cRow, 9].Value = OperateTols(data.Nominal, data.MaxTol, '+');
+                    }
+                    else
+                    {
+                        ws.Cells[cRow, 3].Value = data.Nominal == "" ? "0.0" : data.Nominal; //nominal
+                        ws.Cells[cRow, 5].Value = data.MaxTol == "" ? "0.0" : data.MaxTol; // tolerance
+                        ws.Cells[cRow, 9].Value = OperateTols(data.Nominal, data.MaxTol, '+'); // min tol
+                        ws.Cells[cRow, 7].Value = OperateTols(data.Nominal, data.MaxTol, '-'); // max tol
+                    }
+
+                    ws.Cells[cRow, 7, cRow, 9].Style.WrapText = false;
+                    ws.Cells[cRow, 10].Value = "CMM"; // type
+                    ws.Cells[cRow, 11].Value = decimal.Parse(data.Actual).ToString("0.000"); // actual
+
                 }
-                catch(Exception ex)
+                else
                 {
-                    continue;
-                    //MessageBox.Show(ex.ToString() + cRow.ToString());
+                    ws.Cells[cRow, nextCol].Value = decimal.Parse(data.Actual).ToString("0.000");
+                    actualColorSetter = nextCol;
+                }
+
+                string actual = data.Actual == "" ? "0.0" : data.Actual;
+                string lower = ws.Cells[cRow, 7].Value == null ? "0.0" : ws.Cells[cRow, 7].Value.ToString();
+                string upper = ws.Cells[cRow, 9].Value == null ? "0.0" : ws.Cells[cRow, 9].Value.ToString();
+
+                if (decimal.Parse(actual) > decimal.Parse(upper) || decimal.Parse(actual) < decimal.Parse(lower))
+                {
+                    ws.Cells[cRow, actualColorSetter].Style.Font.Color.SetColor(Color.Red);
                 }
 
                 cRow++;
@@ -674,13 +684,15 @@ namespace CMM_DM
 
         private string AndReplacer(string val)
         {
-            if (val.Contains("and")) val = Regex.Replace(val, " and ", "-");
+            if (!string.IsNullOrEmpty(val) && val.Contains("and")) val = Regex.Replace(val, "and", "-");
 
             return val;
         }
 
         private string OperateTols(string nom, string tol, char op)
         {
+            nom = nom == "" ? "0.0" : nom;
+            tol = tol == "" ? "0.0" : tol;
             string nominal = "";
             string tolerance = "";
             decimal res = 0;
@@ -719,7 +731,7 @@ namespace CMM_DM
                 MessageBox.Show($"Error: {ex.Message}");
             }
 
-            return res.ToString("0.00");
+            return res.ToString("0.000");
         }
 
         private void button1_Click(object sender, EventArgs e)
